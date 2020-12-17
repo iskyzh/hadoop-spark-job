@@ -3,10 +3,24 @@ deploy:
 	scp -o 'ProxyJump root@124.70.146.167' -r hadoop-docker root@192.168.0.200:~
 	scp -o 'ProxyJump root@124.70.146.167' -r hadoop-docker root@192.168.0.249:~
 
+swarm-deploy: deploy
+	ssh root@124.70.146.167 "cd ~/hadoop-docker && ls -al && make swarm-deploy"
+
+status:
+	ssh root@124.70.146.167 "docker ps"
+	ssh -J root@124.70.146.167 root@192.168.0.200 "docker ps"
+	ssh -J root@124.70.146.167 root@192.168.0.249 "docker ps"
+
+
 up: deploy
 	ssh root@124.70.146.167 "cd ~/hadoop-docker && ls -al && make master"
 	ssh -J root@124.70.146.167 root@192.168.0.200 "cd ~/hadoop-docker && ls && make worker_1"
 	ssh -J root@124.70.146.167 root@192.168.0.249 "cd ~/hadoop-docker && ls && make worker_2"
+
+down:
+	ssh root@124.70.146.167 "cd ~/hadoop-docker && ls -al && make down"
+	ssh -J root@124.70.146.167 root@192.168.0.200 "cd ~/hadoop-docker && ls && make down"
+	ssh -J root@124.70.146.167 root@192.168.0.249 "cd ~/hadoop-docker && ls && make down"
 
 hadoop-build:
 	cd map-reduce-temperature && mvn clean install
